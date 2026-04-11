@@ -107,8 +107,13 @@ Make a new agent in `WizardAlphaBeta` that uses alpha-beta pruning to perform a 
 - Good ordering of branches based on your evaluation function
 - Breaking on an inclusive comparison for alpha and beta values rather than exclusive 
 
-## Making a good evaluation function
-Based on your correct implementation of alpha-beta search, and using your evaluation function to differentiate, your wizard will be put through a trial of dungeons with both random and greedy goblins in multiple different maps (including `pacman` as well as other hidden autograder maps) where your agent will be scored on how well it is able to both reliably survive and get to the portal as well as collect crystals along the way. You will be rewarded 10 points for each crystal your wizard can bring back through the portal, but lose 50 points if your wizard is killed or it takes too long either processing or running around in the dungeon (it isnt free to keep a portal open forever!). This score averages over mulitple trials will form another leaderboard where you can compete to design the best evaluation function to power alpha-beta and have the best adversarial wizard.
+## Improving your evaluation function
+
+Based on your correct implementation of alpha-beta search, and using your evaluation function to differentiate, your wizard will be put through a trial of dungeons with both random and greedy goblins in multiple different maps (including `pacman` as well as other hidden autograder maps) where your agent will be scored on how well it is able to both reliably survive and get to the portal as well as collect crystals along the way. 
+
+You will be rewarded 10 points for each crystal your wizard can bring back through the portal, but lose 50 points if your wizard is killed or it takes too long either processing or running around in circles (it isnt free to keep a portal open forever!). This score averages over mulitple trials will form another leaderboard where you can compete to design the best evaluation function to power alpha-beta and have the best adversarial wizard.
+
+When designing your evaluation function consider that goblins may be acting randomly, and so may be hard to predict in mini-max. Consider what kinds of features to model (i.e. how you will expect to score, what is your proximity to danger, how likely you are to timeout before getting to the portal, etc...) as well as how to weight them.
 
 
 ## Expectimax
