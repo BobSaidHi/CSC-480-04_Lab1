@@ -31,7 +31,7 @@ parser.add_argument(
     "--agent",
     type=str,
     default="dfs",
-    help="Search Agents: dfs, bfs, ucs, astar, crystal, suboptimal, greedy, minimax, expectimax, alphabeta",
+    help="Search Agents: dfs, bfs, astar, crystal, suboptimal, greedy, minimax, expectimax, alphabeta",
 )
 
 parser.add_argument(
@@ -69,7 +69,6 @@ args = parser.parse_args()
 available_agents = {
     "dfs": WizardDFS,
     "bfs": WizardBFS,
-    "ucs": WizardUCS,
     "astar": WizardAstar,
     "crystal": CrystalSearchWizard,
     "suboptimal": SuboptimalCrystalSearchWizard,
