@@ -121,3 +121,11 @@ When designing your evaluation function consider that goblins may be acting rand
 ## Expectimax
 
 Finally, while minimax and alpha-beta are very powerful, they are sometimes too conservative when playing against non-optimal opponents like `RandomGoblin`. In this case, we might expect that modeling opponent behaviour using expectimax might perform better. In `WizardExpectimax`, implement an expectimax search and see how it performs against both `random` and `greedy` goblins.
+
+## Results
+
+| Agent | Score | Turns | Nodes Explored | Time Taken (s) |
+| ---   | ---   | ---   | ---            | ---            |
+| DFS   | 0     | 49    | 62             | 11.37          |
+| BFS   | 0     | 29    | 131            | 16.28          |
+
