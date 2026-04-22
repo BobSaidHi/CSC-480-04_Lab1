@@ -29,6 +29,8 @@ class WizardDFS(WizardSearchAgent):
         portal_loc: Location
 
     paths: dict[SearchState, list[WizardMoves]] = {}
+    ##
+    # @brief DFS stack / frontier of search states to expand
     search_stack: list[SearchState] = []
     initial_game_state: GameState
 
@@ -66,6 +68,9 @@ class WizardDFS(WizardSearchAgent):
         self.paths[initial_search_state] = []
         self.search_stack = [initial_search_state]
 
+    ##
+    # @brief Check if the wizard location matches the portal location
+    # @returns True if the goal (portal) has been reached, False otherwise
     def is_goal(self, state: SearchState) -> bool:
         return state.wizard_loc == state.portal_loc
 
@@ -77,8 +82,21 @@ class WizardDFS(WizardSearchAgent):
     # @returns the next game state to expand, or nothing if there are
     # no more states to expand
     def next_search_expansion(self) -> GameState | None:
-        # TODO: YOUR CODE HERE
-        raise NotImplementedError
+        # Check frontier
+        # @details: In Python, len is a separate function, not a class method
+        if(len(self.search_stack) == 0):
+            return None
+        
+        # Else: Pop a search state from DFS frontier LIFO stack
+        nextSearchState = self.search_stack.pop()
+
+        # Check if goal has been reached
+        if(self.is_goal(nextSearchState)):
+            self.plan = self.paths[nextSearchState]
+            return None
+        
+        # Else: Return the state / node to expand next
+        return self.search_to_game(nextSearchState)
 
     # @brief Process a successor node
     # @param source: one of the successors (an expanded game state . node) of the returned node from
