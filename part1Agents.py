@@ -84,17 +84,17 @@ class WizardDFS(WizardSearchAgent):
     def next_search_expansion(self) -> GameState | None:
         # Check frontier
         # @details: In Python, len is a separate function, not a class method
-        if(len(self.search_stack) == 0):
+        if len(self.search_stack) == 0:
             return None
-        
+
         # Else: Pop a search state from DFS frontier LIFO stack
         nextSearchState = self.search_stack.pop()
 
         # Check if goal has been reached
-        if(self.is_goal(nextSearchState)):
+        if self.is_goal(nextSearchState):
             self.plan = list(reversed(self.paths[nextSearchState]))
             return None
-        
+
         # Else: Return the state / node to expand next
         return self.search_to_game(nextSearchState)
 
@@ -114,7 +114,7 @@ class WizardDFS(WizardSearchAgent):
         # Check if the target search state has already been visited (in paths)
         if targetSearchState in self.paths:
             return
-        
+
         # Else: Build new path
         # @details:  Copy the actions / path dict and append the new action
         newPath = self.paths[sourceSearchState] + [action]
@@ -126,9 +126,10 @@ class WizardDFS(WizardSearchAgent):
         if self.is_goal(targetSearchState):
             self.plan = list(reversed(newPath))
             return
-        
+
         # Else: Add to frontier (push)
         self.search_stack.append(targetSearchState)
+
 
 class WizardBFS(WizardSearchAgent):
     @dataclass(eq=True, frozen=True, order=True)
@@ -177,15 +178,61 @@ class WizardBFS(WizardSearchAgent):
     def is_goal(self, state: SearchState) -> bool:
         return state.wizard_loc == state.portal_loc
 
+    # @brief "choose game states to expand"
+    # @details Will be called repeatedly while a `plan` is not available yet
+    # (empty), unless no next search expansion is returned
+    # @details Pops a search state from BFS frontier FIFO queue.
+    # Use search_to_game() as needed and return the node to expand.
+    # @returns the next game state to expand, or nothing if there are
+    # no more states to expand
     def next_search_expansion(self) -> GameState | None:
-        # TODO: YOUR CODE HERE
-        raise NotImplementedError
+        # Check frontier
+        # @details: In Python, len is a separate function, not a class method
+        if len(self.search_stack) == 0:
+            return None
 
+        # Else: Pop a search state from BFS frontier FIFO queue
+        nextSearchState = self.search_stack.pop(0)
+
+        # Check if goal has been reached
+        if self.is_goal(nextSearchState):
+            self.plan = list(reversed(self.paths[nextSearchState]))
+            return None
+
+        # Else: Return the state / node to expand next
+        return self.search_to_game(nextSearchState)
+
+    # @brief Process a successor node
+    # @param source: one of the successors (an expanded game state . node) of the returned node from
+    # @param target
+    # @param WizardMoves action that transitions source -> target.
+    # @details converts GameState to SearchState and checks against the list of
+    # already visited states, update path, frontier, and `self.plan` upon
+    # reaching the goal
     def process_search_expansion(
         self, source: GameState, target: GameState, action: WizardMoves
     ) -> None:
-        # TODO: YOUR CODE HERE
-        raise NotImplementedError
+        sourceSearchState = self.game_to_search(source)
+        targetSearchState = self.game_to_search(target)
+
+        # Check if the target search state has already been visited (in paths)
+        if targetSearchState in self.paths:
+            return
+
+        # Else: Build new path
+        # @details:  Copy the actions / path dict and append the new action
+        newPath = self.paths[sourceSearchState] + [action]
+
+        # Save the path
+        self.paths[targetSearchState] = newPath
+
+        # Check if goal has been reached
+        if self.is_goal(targetSearchState):
+            self.plan = list(reversed(newPath))
+            return
+
+        # Else: Add to frontier (push)
+        self.search_stack.append(targetSearchState)
 
 
 class WizardAstar(WizardSearchAgent):
