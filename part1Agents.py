@@ -15,6 +15,13 @@ import heapq
 from dataclasses import dataclass
 
 
+# @brief "agent class that performs Depth First Search"
+#
+# @details In order to perform a search a `WizardSearchAgent`
+# has the ability to choose game states to expand and learn
+# their successors (this is the search transition function)
+# as well as must have a way to process each new state that
+# is found through a node expansion.
 class WizardDFS(WizardSearchAgent):
     @dataclass(eq=True, frozen=True, order=True)
     class SearchState:
@@ -34,7 +41,9 @@ class WizardDFS(WizardSearchAgent):
                 initial_wizard_loc.row, initial_wizard_loc.col, EmptyEntity()
             )
             .replace_entity(
-                search_state.wizard_loc.row, search_state.wizard_loc.col, initial_wizard
+                search_state.wizard_loc.row,
+                search_state.wizard_loc.col,
+                initial_wizard,
             )
             .replace_active_entity_location(search_state.wizard_loc)
         )
@@ -60,9 +69,24 @@ class WizardDFS(WizardSearchAgent):
     def is_goal(self, state: SearchState) -> bool:
         return state.wizard_loc == state.portal_loc
 
+    # @brief "choose game states to expand"
+    # @details Will be called repeatedly while a `plan` is not available yet
+    # (empty), unless no next search expansion is returned
+    # @details Pops a search state from DFS frontier LIFO stack.
+    # Use search_to_game() as needed and return the node to expand.
+    # @returns the next game state to expand, or nothing if there are
+    # no more states to expand
     def next_search_expansion(self) -> GameState | None:
         # TODO: YOUR CODE HERE
         raise NotImplementedError
+
+    # @brief Process a successor node
+    # @param source: one of the successors (an expanded game state . node) of the returned node from
+    # @param target
+    # @param WizardMoves action that transitions source -> target.
+    # @details converts GameState to SearchState and checks against the list of
+    # already visited states, update path, frontier, and `self.plan` upon
+    # reaching the goal
 
     def process_search_expansion(
         self, source: GameState, target: GameState, action: WizardMoves
@@ -90,7 +114,9 @@ class WizardBFS(WizardSearchAgent):
                 initial_wizard_loc.row, initial_wizard_loc.col, EmptyEntity()
             )
             .replace_entity(
-                search_state.wizard_loc.row, search_state.wizard_loc.col, initial_wizard
+                search_state.wizard_loc.row,
+                search_state.wizard_loc.col,
+                initial_wizard,
             )
             .replace_active_entity_location(search_state.wizard_loc)
         )
@@ -146,7 +172,9 @@ class WizardAstar(WizardSearchAgent):
                 initial_wizard_loc.row, initial_wizard_loc.col, EmptyEntity()
             )
             .replace_entity(
-                search_state.wizard_loc.row, search_state.wizard_loc.col, initial_wizard
+                search_state.wizard_loc.row,
+                search_state.wizard_loc.col,
+                initial_wizard,
             )
             .replace_active_entity_location(search_state.wizard_loc)
         )
@@ -172,7 +200,9 @@ class WizardAstar(WizardSearchAgent):
     def is_goal(self, state: SearchState) -> bool:
         return state.wizard_loc == state.portal_loc
 
-    def cost(self, source: GameState, target: GameState, action: WizardMoves) -> float:
+    def cost(
+        self, source: GameState, target: GameState, action: WizardMoves
+    ) -> float:
         return 1
 
     def heuristic(self, target: GameState) -> float:
@@ -207,9 +237,7 @@ class CrystalSearchWizard(WizardSearchAgent):
         raise NotImplementedError
 
 
-
 class SuboptimalCrystalSearchWizard(CrystalSearchWizard):
-
     def heuristic(self, target: SearchState) -> float:
         # TODO YOUR CODE HERE
         raise NotImplementedError
