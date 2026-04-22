@@ -29,6 +29,9 @@ class WizardAgent(EntityAgent):
 
 
 class WizardSearchAgent(WizardAgent):
+    ## @brief a list of WizardMoves defining the agent's found path, if
+    # it has been found
+    # @details Do not add illegal moves
     plan: list[WizardMoves] = []
 
     def __init__(self, initial_state: GameState):
@@ -89,7 +92,9 @@ class GreedyGoblinAgent(GoblinAgent):
     def react(self, state: GameState) -> GoblinMoves:
         distances: dict[GameAction, float] = {}
         for action, result in GameTransitions.get_successors(state):
-            wizard_locs = [loc for loc in result.get_all_entity_locations(Wizard)]
+            wizard_locs = [
+                loc for loc in result.get_all_entity_locations(Wizard)
+            ]
             # Always kill the wizard if possible
             if not wizard_locs:
                 return action

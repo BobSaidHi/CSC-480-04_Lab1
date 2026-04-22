@@ -94,6 +94,8 @@ class GoblinMoves(Enum):
 GameAction = WizardMoves | GoblinMoves
 
 
+## @brief 
+# 
 @dataclass(frozen=True, eq=True)
 class GameState:
     grid_size: tuple[int, int]

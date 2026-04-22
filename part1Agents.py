@@ -105,13 +105,30 @@ class WizardDFS(WizardSearchAgent):
     # @details converts GameState to SearchState and checks against the list of
     # already visited states, update path, frontier, and `self.plan` upon
     # reaching the goal
-
     def process_search_expansion(
         self, source: GameState, target: GameState, action: WizardMoves
     ) -> None:
-        # TODO: YOUR CODE HERE
-        raise NotImplementedError
+        sourceSearchState = self.game_to_search(source)
+        targetSearchState = self.game_to_search(target)
 
+        # Check if the target search state has already been visited (in paths)
+        if targetSearchState in self.paths:
+            return
+        
+        # Else: Build new path
+        # @details:  Copy the actions / path dict and append the new action
+        newPath = self.paths[sourceSearchState] + [action]
+
+        # Save the path
+        self.paths[targetSearchState] = newPath
+
+        # Check if goal has been reached
+        if self.is_goal(targetSearchState):
+            self.plan = newPath
+            return
+        
+        # Else: Add to frontier (push)
+        self.search_stack.append(targetSearchState)
 
 class WizardBFS(WizardSearchAgent):
     @dataclass(eq=True, frozen=True, order=True)
