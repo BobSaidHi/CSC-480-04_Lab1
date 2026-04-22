@@ -92,7 +92,7 @@ class WizardDFS(WizardSearchAgent):
 
         # Check if goal has been reached
         if(self.is_goal(nextSearchState)):
-            self.plan = self.paths[nextSearchState]
+            self.plan = list(reversed(self.paths[nextSearchState]))
             return None
         
         # Else: Return the state / node to expand next
@@ -124,7 +124,7 @@ class WizardDFS(WizardSearchAgent):
 
         # Check if goal has been reached
         if self.is_goal(targetSearchState):
-            self.plan = newPath
+            self.plan = list(reversed(newPath))
             return
         
         # Else: Add to frontier (push)
