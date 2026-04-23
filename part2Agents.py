@@ -142,9 +142,9 @@ class WizardMiniMax(ReasoningWizard):
 
         # Check if portal reached & out of crystals
         onPortal = isinstance(state.tile_grid[wizard.row][wizard.col], Portal)
-        noCrystals = len(state.get_all_entity_locations(Crystal)) == 0
+        # noCrystals = len(state.get_all_entity_locations(Crystal)) == 0
 
-        if onPortal and noCrystals:
+        if onPortal: #and noCrystals:
             return True
 
         # Else: not done
@@ -276,9 +276,9 @@ class WizardAlphaBeta(ReasoningWizard):
 
         # Check if portal reached & out of crystals
         onPortal = isinstance(state.tile_grid[wizard.row][wizard.col], Portal)
-        noCrystals = len(state.get_all_entity_locations(Crystal)) == 0
+        # noCrystals = len(state.get_all_entity_locations(Crystal)) == 0
 
-        if onPortal and noCrystals:
+        if onPortal: # and noCrystals:
             return True
 
         # Else: not done
