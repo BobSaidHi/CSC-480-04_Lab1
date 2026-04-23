@@ -160,7 +160,7 @@ class WizardMiniMax(ReasoningWizard):
         bestAction = WizardMoves.STAY
         bestScore = float("-inf")
         for possibleAction, possibleNextState in successorGameStates:
-            possibleScore = self.minimax(possibleNextState, 1)
+            possibleScore = self.minimax(possibleNextState, 0)
             if possibleScore > bestScore:
                 bestScore = possibleScore
                 bestAction = possibleAction
@@ -300,7 +300,7 @@ class WizardAlphaBeta(ReasoningWizard):
         # orderedSuccessorGameStates = list(successorGameStates).sort()
 
         for possibleAction, possibleNextState in successorGameStates:
-            possibleScore = self.alpha_beta_minimax(possibleNextState, 1)
+            possibleScore = self.alpha_beta_minimax(possibleNextState, 0)
             if possibleScore > bestScore:
                 bestScore = possibleScore
                 bestAction = possibleAction
