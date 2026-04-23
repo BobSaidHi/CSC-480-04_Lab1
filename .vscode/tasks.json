@@ -47,6 +47,24 @@
                 "kind": "test",
                 "isDefault": false
             }
+        },
+        {
+            "label": "Run GreedyWizard (random goblin)",
+            "type": "shell",
+            "command": "python run.py --agent greedy --goblin random --map arena",
+            "group": {
+                "kind": "test",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "Run GreedyWizard (greedy goblin)",
+            "type": "shell",
+            "command": "python run.py --agent greedy --goblin greedy --map arena",
+            "group": {
+                "kind": "test",
+                "isDefault": false
+            }
         }
     ]
 }
