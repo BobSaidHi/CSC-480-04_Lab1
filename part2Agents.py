@@ -1,3 +1,5 @@
+from typing import overload
+
 from model import (
     Location,
     Portal,
@@ -163,7 +165,7 @@ class WizardMiniMax(ReasoningWizard):
                 bestScore = possibleScore
                 bestAction = possibleAction
 
-        return bestAction  # FIXME - type
+        return bestAction  # DONE - type
 
     def minimax(self, state: GameState, depth: int):
         # Base case - terminal
@@ -291,15 +293,30 @@ class WizardAlphaBeta(ReasoningWizard):
 
         bestAction = WizardMoves.STAY
         bestScore = float("-inf")
+        alphaMaxed = float("-inf")
+        betaMined = float("inf")
+
+        # Evaluate successor states for optimal search order
+        # orderedSuccessorGameStates = list(successorGameStates).sort()
+
         for possibleAction, possibleNextState in successorGameStates:
-            possibleScore = self.minimax(possibleNextState, 1)
+            possibleScore = self.alpha_beta_minimax(possibleNextState, 1)
             if possibleScore > bestScore:
                 bestScore = possibleScore
                 bestAction = possibleAction
+            if bestScore > alphaMaxed:
+                alphaMaxed = bestScore
 
-        return bestAction  # FIXME - type
+        return bestAction  # DONE - type
 
-    def minimax(self, state: GameState, depth: int):
+    def alpha_beta_minimax(self, state: GameState, depth: int):
+        return self.alpha_beta_minimax2(
+            state, depth, float("-inf"), float("inf")
+        )
+
+    def alpha_beta_minimax2(
+        self, state: GameState, depth: int, alphaMaxed, betaMined
+    ):
         # Base case - terminal
         if self.is_terminal(state):
             return self.evaluation(state)
@@ -318,19 +335,49 @@ class WizardAlphaBeta(ReasoningWizard):
         # Wizard turn (MAXi node)
         if isinstance(activeEntity, Wizard):
             bestForWizard = float("-inf")
+
+            # Improve ordering
+            # MAX node: best first (high to low)
+            ordered = list(successorGameStates)
+            ordered.sort(key=self.orderByScore, reverse=True)
+
             for possibleAction, possibleState in successorGameStates:
-                val = self.minimax(possibleState, depth + 1)
+                val = self.alpha_beta_minimax2(
+                    possibleState, depth + 1, alphaMaxed, betaMined
+                )
                 if val > bestForWizard:
                     bestForWizard = val
+                if bestForWizard > alphaMaxed:
+                    alphaMaxed = bestForWizard
+                if alphaMaxed >= betaMined:
+                    # Prune
+                    break
             return bestForWizard
 
-        # Worst: Goblin turn (MINi node)
+        # Else: Worst: Goblin turn (MINi node)
         worstForWizard = float("inf")
+
+        # Improve ordering
+        # MIN node: worst for wizard first (low to high)
+        ordered = list(successorGameStates)
+        ordered.sort(key=self.orderByScore)
+
         for possibleAction, possibleState in successorGameStates:
-            val = self.minimax(possibleState, depth)  # depth unchanged
+            val = self.alpha_beta_minimax2(
+                possibleState, depth, alphaMaxed, betaMined
+            )
             if val < worstForWizard:
                 worstForWizard = val
+            if worstForWizard < betaMined:
+                betaMined = worstForWizard
+            if alphaMaxed >= betaMined:
+                # Prune
+                break
         return worstForWizard
+
+    def orderByScore(self, successor):
+        action, nextState = successor
+        return self.evaluation(nextState)
 
 
 class WizardExpectimax(ReasoningWizard):
