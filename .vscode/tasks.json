@@ -20,6 +20,15 @@
                 "kind": "test",
                 "isDefault": false
             }
+        },
+        {
+            "label": "Run A*",
+            "type": "shell",
+            "command": "python run.py --agent astar --map dungeon",
+            "group": {
+                "kind": "test",
+                "isDefault": false
+            }
         }
     ]
 }

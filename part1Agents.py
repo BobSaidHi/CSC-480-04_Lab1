@@ -242,6 +242,7 @@ class WizardAstar(WizardSearchAgent):
         portal_loc: Location
 
     paths: dict[SearchState, tuple[float, list[WizardMoves]]] = {}
+    # @brief A* frontier priority queue
     search_pq: list[tuple[float, SearchState]] = []
     initial_game_state: GameState
 
@@ -288,18 +289,75 @@ class WizardAstar(WizardSearchAgent):
         return 1
 
     def heuristic(self, target: GameState) -> float:
-        # TODO: YOUR CODE HERE
-        raise NotImplementedError
+        # Get relevant locations
+        wizardLoc = target.active_entity_location
+        portalLoc = target.get_all_tile_locations(Portal)[0]
+
+        # Let's try straight line distance
+        # Should be a gross underestimate
+        a = wizardLoc.row - portalLoc.row
+        b = wizardLoc.col - portalLoc.col
+        return pow(pow(a, 2) + pow(b, 2), 0.5)
 
     def next_search_expansion(self) -> GameState | None:
-        # TODO: YOUR CODE HERE
-        raise NotImplementedError
+        while len(self.search_pq) > 0:
+            currentTotalCost, currentNode = heapq.heappop(self.search_pq)
+
+            # Skip if this state no longer tracked
+            if currentNode not in self.paths:
+                continue
+
+            currentCostSoFar, currentPath = self.paths[currentNode]
+            currentGameState = self.search_to_game(currentNode)
+            expectedTotalCost = currentCostSoFar + self.heuristic(
+                currentGameState
+            )
+
+            # Skip outdated / worse queue entries
+            if currentTotalCost > expectedTotalCost:
+                continue
+
+            # Check for goal
+            if self.is_goal(currentNode):
+                self.plan = list(reversed(currentPath))
+                return None
+
+            # Expand later
+            return currentGameState
+
+        # No more states to expand
+        return None
 
     def process_search_expansion(
         self, source: GameState, target: GameState, action: WizardMoves
     ) -> None:
-        # TODO: YOUR CODE HERE
-        raise NotImplementedError
+        # Convert to search states
+        sourceSearchState = self.game_to_search(source)
+        targetSearchState = self.game_to_search(target)
+
+        # Extract sourceCostSoFar
+        sourceCostSoFar, sourcePath = self.paths[sourceSearchState]
+
+        # Else: Build new path & calculate cost
+        # @details:  Copy the actions / path dict and append the new action
+        newCostSoFar = sourceCostSoFar + self.cost(source, target, action)
+        newPath = sourcePath + [action]
+
+        # Check if the target search state has already been visited (in paths) with a lower cost
+        # @details Check for other paths to the same search state
+        prevTargetEntry = self.paths.get(targetSearchState)
+        # @details Validate that it was actually returned
+        if prevTargetEntry is not None:
+            prevCostSoFar, prevPath = prevTargetEntry
+            # @details Check cost
+            if newCostSoFar >= prevCostSoFar:
+                # Not cheaper
+                return
+
+        # Save if better or non was found
+        self.paths[targetSearchState] = (newCostSoFar, newPath)
+        newTotalCost = newCostSoFar + self.heuristic(target)
+        heapq.heappush(self.search_pq, (newTotalCost, targetSearchState))
 
 
 class CrystalSearchWizard(WizardSearchAgent):

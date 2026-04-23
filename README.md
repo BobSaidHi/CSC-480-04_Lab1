@@ -128,4 +128,5 @@ Finally, while minimax and alpha-beta are very powerful, they are sometimes too 
 | ---   | ---   | ---   | ---            | ---            |
 | DFS   | 0     | 49    | 62             | 11.37          |
 | BFS   | 0     | 29    | 131            | 16.28          |
+| A*    | 0     | 29    | 89             | 12.31          |
 
