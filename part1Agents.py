@@ -365,21 +365,39 @@ class CrystalSearchWizard(WizardSearchAgent):
     class SearchState:
         wizard_loc: Location
         portal_loc: Location
+        crystalLocs: tuple[Location]
 
     paths: dict[SearchState, tuple[float, list[WizardMoves]]] = {}
     # @brief A* frontier priority queue
     search_pq: list[tuple[float, SearchState]] = []
     initial_game_state: GameState
 
+    ##
+    # @brief Convert a SearchState to a GameState
     def search_to_game(self, search_state: SearchState) -> GameState:
         initial_wizard_loc = self.initial_game_state.active_entity_location
         initial_wizard = self.initial_game_state.get_active_entity()
+        initialCrystalLocs = self.initial_game_state.get_all_entity_locations(
+            Crystal
+        )
 
-        new_game_state = (
-            self.initial_game_state.replace_entity(
-                initial_wizard_loc.row, initial_wizard_loc.col, EmptyEntity()
+        new_game_state = self.initial_game_state.replace_entity(
+            initial_wizard_loc.row, initial_wizard_loc.col, EmptyEntity()
+        )
+        for loc in initialCrystalLocs:
+            new_game_state = new_game_state.replace_entity(
+                loc.row, loc.col, EmptyEntity()
             )
-            .replace_entity(
+
+        # Re-add remaining crystals from SearchState.
+        for loc in search_state.crystalLocs:
+            new_game_state = new_game_state.replace_entity(
+                loc.row, loc.col, Crystal()
+            )
+
+        # Place wizard and set active location.
+        new_game_state = (
+            new_game_state.replace_entity(
                 search_state.wizard_loc.row,
                 search_state.wizard_loc.col,
                 initial_wizard,
@@ -389,24 +407,37 @@ class CrystalSearchWizard(WizardSearchAgent):
 
         return new_game_state
 
+    ##
+    # @brief Convert a GameState to a SearchState
     def game_to_search(self, game_state: GameState) -> SearchState:
         wizard_loc = game_state.active_entity_location
         portal_loc = game_state.get_all_tile_locations(Portal)[0]
-        return self.SearchState(wizard_loc, portal_loc)
+        # @details Need to be sorted to ensure consistent tuple ordering / behavior
+        crystalLocs = tuple(
+            sorted(game_state.get_all_entity_locations(Crystal))
+        )
+        return self.SearchState(wizard_loc, portal_loc, crystalLocs)
 
     def __init__(self, initial_state: GameState):
         self.start_search(initial_state)
 
     def start_search(self, game_state: GameState):
         self.initial_game_state = game_state
+        # self.plan = []
 
         initial_search_state = self.game_to_search(game_state)
         self.paths = {}
-        self.paths[initial_search_state] = 0, []
+        self.paths[initial_search_state] = (0, [])
         self.search_pq = [(0, initial_search_state)]
 
+    ##
+    # @brief Check if the wizard location matches the portal location
+    # @returns True if the goal (portal) has been reached, False otherwise
+    # @details Python uses and for && (logical AND)
     def is_goal(self, state: SearchState) -> bool:
-        return state.wizard_loc == state.portal_loc
+        return (state.wizard_loc == state.portal_loc) and (
+            len(state.crystalLocs) == 0
+        )
 
     def cost(
         self, source: GameState, target: GameState, action: WizardMoves
@@ -416,12 +447,18 @@ class CrystalSearchWizard(WizardSearchAgent):
     def heuristic(self, target: GameState) -> float:
         # Get relevant locations
         wizardLoc = target.active_entity_location
-        portalLoc = target.get_all_tile_locations(Portal)[0]
+
+        if len(target.get_all_tile_locations(Crystal)) > 0:
+            # Get crystal first
+            targetLoc = target.get_all_tile_locations(Crystal)[0]
+        else:
+            # Get out
+            targetLoc = target.get_all_tile_locations(Portal)[0]
 
         # Let's try straight line distance
         # Should be a gross underestimate
-        a = wizardLoc.row - portalLoc.row
-        b = wizardLoc.col - portalLoc.col
+        a = wizardLoc.row - targetLoc.row
+        b = wizardLoc.col - targetLoc.col
         return pow(pow(a, 2) + pow(b, 2), 0.5)
 
     def next_search_expansion(self) -> GameState | None:
