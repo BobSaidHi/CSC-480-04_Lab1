@@ -137,6 +137,24 @@
                 "kind": "test",
                 "isDefault": false
             }
+        },
+        {
+            "label": "Run AlphaBeta (random goblin, pacman)",
+            "type": "shell",
+            "command": "python run.py --agent alphabeta --goblin random --map pacman --depth 2",
+            "group": {
+                "kind": "test",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "Run AlphaBeta (greedy goblin, pacman)",
+            "type": "shell",
+            "command": "python run.py --agent alphabeta --goblin greedy --map pacman --depth 2",
+            "group": {
+                "kind": "test",
+                "isDefault": false
+            }
         }
     ]
 }
