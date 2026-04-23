@@ -455,11 +455,10 @@ class CrystalSearchWizard(WizardSearchAgent):
             # Get out
             targetLoc = target.get_all_tile_locations(Portal)[0]
 
-        # Let's try straight line distance
-        # Should be a gross underestimate
+        # Try Manhattan distance, hopefully faster than straight line 
         a = wizardLoc.row - targetLoc.row
         b = wizardLoc.col - targetLoc.col
-        return pow(pow(a, 2) + pow(b, 2), 0.5)
+        return abs(a) + abs(b)
 
     def next_search_expansion(self) -> GameState | None:
         while len(self.search_pq) > 0:
