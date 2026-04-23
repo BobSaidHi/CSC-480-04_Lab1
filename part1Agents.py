@@ -361,20 +361,128 @@ class WizardAstar(WizardSearchAgent):
 
 
 class CrystalSearchWizard(WizardSearchAgent):
-    # TODO: YOUR CODE HERE
+    @dataclass(eq=True, frozen=True, order=True)
+    class SearchState:
+        wizard_loc: Location
+        portal_loc: Location
+
+    paths: dict[SearchState, tuple[float, list[WizardMoves]]] = {}
+    # @brief A* frontier priority queue
+    search_pq: list[tuple[float, SearchState]] = []
+    initial_game_state: GameState
+
+    def search_to_game(self, search_state: SearchState) -> GameState:
+        initial_wizard_loc = self.initial_game_state.active_entity_location
+        initial_wizard = self.initial_game_state.get_active_entity()
+
+        new_game_state = (
+            self.initial_game_state.replace_entity(
+                initial_wizard_loc.row, initial_wizard_loc.col, EmptyEntity()
+            )
+            .replace_entity(
+                search_state.wizard_loc.row,
+                search_state.wizard_loc.col,
+                initial_wizard,
+            )
+            .replace_active_entity_location(search_state.wizard_loc)
+        )
+
+        return new_game_state
+
+    def game_to_search(self, game_state: GameState) -> SearchState:
+        wizard_loc = game_state.active_entity_location
+        portal_loc = game_state.get_all_tile_locations(Portal)[0]
+        return self.SearchState(wizard_loc, portal_loc)
 
     def __init__(self, initial_state: GameState):
         self.start_search(initial_state)
 
+    def start_search(self, game_state: GameState):
+        self.initial_game_state = game_state
+
+        initial_search_state = self.game_to_search(game_state)
+        self.paths = {}
+        self.paths[initial_search_state] = 0, []
+        self.search_pq = [(0, initial_search_state)]
+
+    def is_goal(self, state: SearchState) -> bool:
+        return state.wizard_loc == state.portal_loc
+
+    def cost(
+        self, source: GameState, target: GameState, action: WizardMoves
+    ) -> float:
+        return 1
+
+    def heuristic(self, target: GameState) -> float:
+        # Get relevant locations
+        wizardLoc = target.active_entity_location
+        portalLoc = target.get_all_tile_locations(Portal)[0]
+
+        # Let's try straight line distance
+        # Should be a gross underestimate
+        a = wizardLoc.row - portalLoc.row
+        b = wizardLoc.col - portalLoc.col
+        return pow(pow(a, 2) + pow(b, 2), 0.5)
+
     def next_search_expansion(self) -> GameState | None:
-        # TODO YOUR CODE HEREs
-        raise NotImplementedError
+        while len(self.search_pq) > 0:
+            currentTotalCost, currentNode = heapq.heappop(self.search_pq)
+
+            # Skip if this state no longer tracked
+            if currentNode not in self.paths:
+                continue
+
+            currentCostSoFar, currentPath = self.paths[currentNode]
+            currentGameState = self.search_to_game(currentNode)
+            expectedTotalCost = currentCostSoFar + self.heuristic(
+                currentGameState
+            )
+
+            # Skip outdated / worse queue entries
+            if currentTotalCost > expectedTotalCost:
+                continue
+
+            # Check for goal
+            if self.is_goal(currentNode):
+                self.plan = list(reversed(currentPath))
+                return None
+
+            # Expand later
+            return currentGameState
+
+        # No more states to expand
+        return None
 
     def process_search_expansion(
         self, source: GameState, target: GameState, action: WizardMoves
     ) -> None:
-        # TODO YOUR CODE HERE
-        raise NotImplementedError
+        # Convert to search states
+        sourceSearchState = self.game_to_search(source)
+        targetSearchState = self.game_to_search(target)
+
+        # Extract sourceCostSoFar
+        sourceCostSoFar, sourcePath = self.paths[sourceSearchState]
+
+        # Else: Build new path & calculate cost
+        # @details:  Copy the actions / path dict and append the new action
+        newCostSoFar = sourceCostSoFar + self.cost(source, target, action)
+        newPath = sourcePath + [action]
+
+        # Check if the target search state has already been visited (in paths) with a lower cost
+        # @details Check for other paths to the same search state
+        prevTargetEntry = self.paths.get(targetSearchState)
+        # @details Validate that it was actually returned
+        if prevTargetEntry is not None:
+            prevCostSoFar, prevPath = prevTargetEntry
+            # @details Check cost
+            if newCostSoFar >= prevCostSoFar:
+                # Not cheaper
+                return
+
+        # Save if better or non was found
+        self.paths[targetSearchState] = (newCostSoFar, newPath)
+        newTotalCost = newCostSoFar + self.heuristic(target)
+        heapq.heappush(self.search_pq, (newTotalCost, targetSearchState))
 
 
 class SuboptimalCrystalSearchWizard(CrystalSearchWizard):

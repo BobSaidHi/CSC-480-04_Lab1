@@ -29,6 +29,24 @@
                 "kind": "test",
                 "isDefault": false
             }
+        },
+        {
+            "label": "Run CrystalSearch (dungeon)",
+            "type": "shell",
+            "command": "python run.py --agent crystal --map dungeon",
+            "group": {
+                "kind": "test",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "Run CrystalSearch (many-crystals)",
+            "type": "shell",
+            "command": "python run.py --agent crystal --map many-crystals",
+            "group": {
+                "kind": "test",
+                "isDefault": false
+            }
         }
     ]
 }
