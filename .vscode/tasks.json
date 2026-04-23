@@ -101,6 +101,42 @@
                 "kind": "test",
                 "isDefault": false
             }
+        },
+        {
+            "label": "Run AlphaBeta (random goblin, arena)",
+            "type": "shell",
+            "command": "python run.py --agent alphabeta --goblin random --map arena",
+            "group": {
+                "kind": "test",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "Run AlphaBeta (greedy goblin, arena)",
+            "type": "shell",
+            "command": "python run.py --agent alphabeta --goblin greedy --map arena",
+            "group": {
+                "kind": "test",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "Run AlphaBeta (random goblin, big-map)",
+            "type": "shell",
+            "command": "python run.py --agent alphabeta --goblin random --map big-map --depth 2",
+            "group": {
+                "kind": "test",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "Run AlphaBeta (greedy goblin, big-map)",
+            "type": "shell",
+            "command": "python run.py --agent alphabeta --goblin greedy --map big-map --depth 2",
+            "group": {
+                "kind": "test",
+                "isDefault": false
+            }
         }
     ]
 }
