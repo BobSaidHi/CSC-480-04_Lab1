@@ -1,0 +1,3 @@
+@echo Opening HTML documentation in browser...
+.\docs\doxygen-out\html\index.html
+

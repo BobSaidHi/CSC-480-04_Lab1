@@ -4,6 +4,11 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "label": "Build API Docs (Windows)",
+            "type": "shell",
+            "command": ".\\docs\\Docs_RunDoxygen.bat",
+        },
+        {
             "label": "Run DFS",
             "type": "shell",
             "command": "python run.py --agent dfs --map dungeon",

@@ -2,3 +2,4 @@
 /pyglet/__pycache__
 /pyglet/libs/__pycache__
 *.pyc
+/docs/doxygen-out
