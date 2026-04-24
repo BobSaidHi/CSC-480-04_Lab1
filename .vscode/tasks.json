@@ -9,6 +9,16 @@
             "command": ".\\docs\\Docs_RunDoxygen.bat",
         },
         {
+            "label": "Build & Open API Docs (Windows)",
+            "type": "shell",
+            "command": ".\\docs\\Docs_RunDoxygenOpen.bat",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
             "label": "Run DFS",
             "type": "shell",
             "command": "python run.py --agent dfs --map dungeon",
